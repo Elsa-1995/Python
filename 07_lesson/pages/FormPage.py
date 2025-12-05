@@ -6,53 +6,58 @@ from selenium.webdriver.support import expected_conditions as EC
 class FormPage:
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(driver, 5)
-        self.fields = {
-            'first-name': "Иван",
-            'last-name': "Петров",
-            'address': "Ленина, 55-3",
-            'zip-code': "",
-            'city': "Москва",
-            'country': "Россия",
-            'e-mail': "test@skypro.com",
-            'phone': "+7985899998787",
-            'job-position': "QA",
-            'company': "SkyPro"
-        }
+        self.wait = WebDriverWait(driver, 10)
 
-    def open(self):
-        self.driver.get(
-            "https://bonigarcia.dev/selenium-webdriver-java/data-types.html"
-            )
+        # Локаторы полей формы
+        self.first_name = (By.ID, "first-name")
+        self.last_name = (By.ID, "last-name")
+        self.zip_code = (By.ID, "postal-code")
 
-    def fill_form(self):
-        for field, value in self.fields.items():
-            self.wait.until(
-                EC.presence_of_element_located((
-                    By.NAME, field))).send_keys(value)
+        # Локаторы для проверок
+        self.error_message = (By.CSS_SELECTOR, "[data-test='error']")
+        self.error_icon = (By.CSS_SELECTOR, ".error_icon")
+        self.success_indicator = (By.CLASS_NAME, "success-message")
 
-    def submit_form(self):
-        self.wait.until(
-            EC.element_to_be_clickable((
-                By.CSS_SELECTOR, '[type="submit"]'))).click()
+    def fill_form(self, first_name, last_name, zip_code):
+        """Заполняет форму данными"""
+        self.driver.find_element(*self.first_name).send_keys(first_name)
+        self.driver.find_element(*self.last_name).send_keys(last_name)
+        self.driver.find_element(*self.zip_code).send_keys(zip_code)
 
-    def get_field_class(self, field_id):
-        element = self.wait.until(
-            EC.presence_of_element_located((
-                By.ID, field_id))).get_attribute("class")
-        return element
+    def clear_form(self):
+        """Очищает форму"""
+        self.driver.find_element(*self.first_name).clear()
+        self.driver.find_element(*self.last_name).clear()
+        self.driver.find_element(*self.zip_code).clear()
 
-    def check_zip_code_error(self):
-        return "alert-danger" in self.get_field_class("zip-code")
+    def has_error(self):
+        """Проверяет, есть ли ошибка на странице"""
+        try:
+            return self.driver.find_element(*self.error_message).is_displayed()
+        except:
+            return False
 
-    def check_fields_success(self):
-        fields = ['first-name', 'last-name', 'address', 'e-mail', 'phone',
-                  'city', 'country', 'job-position', 'company']
-        for field in fields:
-            if "success" not in self.get_field_class(field):
-                return False
-        return True
+    def get_error_text(self):
+        """Возвращает текст ошибки, если она есть"""
+        try:
+            return self.driver.find_element(*self.error_message).text
+        except:
+            return ""
 
-    def check_form_submission(self):
-        assert self.check_zip_code_error()
-        assert self.check_fields_success()
+    def are_fields_valid(self):
+        """Проверяет, все ли поля валидны (нет красной обводки)"""
+        try:
+            # Проверяем наличие класса ошибки у полей
+            fields = [
+                self.driver.find_element(*self.first_name),
+                self.driver.find_element(*self.last_name),
+                self.driver.find_element(*self.zip_code)
+            ]
+
+            # Если у поля есть класс ошибки - оно невалидно
+            for field in fields:
+                if "error" in field.get_attribute("class"):
+                    return False
+            return True
+        except:
+            return False

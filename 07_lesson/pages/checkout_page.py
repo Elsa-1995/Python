@@ -5,28 +5,25 @@ class CheckoutPage:
     def __init__(self, driver):
         self.driver = driver
 
-    # Поля формы
-    first_name_field = (By.ID, "first-name")
-    last_name_field = (By.ID, "last-name")
-    zip_field = (By.ID, "postal-code")
-    continue_button = (By.ID, "continue")
-
-    # Итоговая стоимость
-    total_price = (By.CLASS_NAME, "summary_total_label")
-
     def fill_form(self, first_name, last_name, zip_code):
-        # Заполняем форму
-        self.driver.find_element(*self.first_name_field).send_keys(first_name)
-        self.driver.find_element(*self.last_name_field).send_keys(last_name)
-        self.driver.find_element(*self.zip_field).send_keys(zip_code)
+        self.driver.find_element(By.ID, "first-name").send_keys(first_name)
+        self.driver.find_element(By.ID, "last-name").send_keys(last_name)
+        self.driver.find_element(By.ID, "postal-code").send_keys(zip_code)
 
     def click_continue(self):
-        # Нажимаем Continue
-        self.driver.find_element(*self.continue_button).click()
+        self.driver.find_element(By.ID, "continue").click()
 
-    def check_total_price(self):
-        # Проверяем итоговую стоимость
-        price_text = self.driver.find_element(*self.total_price).text
-        # Извлекаем число из текста "$58.29"
-        actual_price = price_text.split("$")[1]
-        return actual_price
+    def get_total_price(self):
+        return self.driver.find_element(By.CLASS_NAME, "summary_total_label").text
+
+    def has_error(self):
+        try:
+            return self.driver.find_element(By.CSS_SELECTOR, "[data-test='error']").is_displayed()
+        except:
+            return False
+
+    def get_error_text(self):
+        try:
+            return self.driver.find_element(By.CSS_SELECTOR, "[data-test='error']").text
+        except:
+            return ""

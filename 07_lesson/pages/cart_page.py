@@ -5,17 +5,12 @@ class CartPage:
     def __init__(self, driver):
         self.driver = driver
 
-    # Кнопка оформления заказа
-    checkout_button = (By.ID, "checkout")
+    def get_item_count(self):
+        return len(self.driver.find_elements(By.CLASS_NAME, "cart_item"))
 
-    # Товары в корзине
-    item_names = (By.CLASS_NAME, "inventory_item_name")
+    def get_item_names(self):
+        items = self.driver.find_elements(By.CLASS_NAME, "inventory_item_name")
+        return [item.text for item in items]
 
     def click_checkout(self):
-        # Нажимаем кнопку Checkout
-        self.driver.find_element(*self.checkout_button).click()
-
-    def check_cart_items(self):
-        # Проверяем что в корзине 3 товара
-        items = self.driver.find_elements(*self.item_names)
-        return len(items) == 3
+        self.driver.find_element(By.ID, "checkout").click()

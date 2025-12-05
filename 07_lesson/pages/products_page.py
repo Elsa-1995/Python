@@ -5,20 +5,20 @@ class ProductsPage:
     def __init__(self, driver):
         self.driver = driver
 
-    # Кнопки добавления в корзину
-    add_backpack = (By.ID, "add-to-cart-sauce-labs-backpack")
-    add_tshirt = (By.ID, "add-to-cart-sauce-labs-bolt-t-shirt")
-    add_onesie = (By.ID, "add-to-cart-sauce-labs-onesie")
+    def add_backpack_to_cart(self):
+        self.driver.find_element(By.ID, "add-to-cart-sauce-labs-backpack").click()
 
-    # Иконка корзины
-    cart_icon = (By.CLASS_NAME, "shopping_cart_link")
+    def add_tshirt_to_cart(self):
+        self.driver.find_element(By.ID, "add-to-cart-sauce-labs-bolt-t-shirt").click()
 
-    def add_items_to_cart(self):
-        # Добавляем три товара в корзину
-        self.driver.find_element(*self.add_backpack).click()
-        self.driver.find_element(*self.add_tshirt).click()
-        self.driver.find_element(*self.add_onesie).click()
+    def add_onesie_to_cart(self):
+        self.driver.find_element(By.ID, "add-to-cart-sauce-labs-onesie").click()
+
+    def get_cart_count(self):
+        try:
+            return int(self.driver.find_element(By.CLASS_NAME, "shopping_cart_badge").text)
+        except:
+            return 0
 
     def go_to_cart(self):
-        # Переходим в корзину
-        self.driver.find_element(*self.cart_icon).click()
+        self.driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()

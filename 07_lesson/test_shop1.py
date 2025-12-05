@@ -27,9 +27,9 @@ try:
     cart_page = CartPage(driver)
 
     if cart_page.check_cart_items():
-        print("✓ В корзине 3 товара")
+        print("В корзине 3 товара")
     else:
-        print("✗ Ошибка: не все товары в корзине")
+        print("Ошибка: не все товары в корзине")
 
     cart_page.click_checkout()
 
@@ -43,9 +43,9 @@ try:
     expected_price = "58.29"
 
     if actual_price == expected_price:
-        print(f"✓ Тест пройден! Итоговая сумма: ${actual_price}")
+        print(f"Тест пройден! Итоговая сумма: ${actual_price}")
     else:
-        print(f"✗ Ошибка! Ожидалось: ${expected_price}, Получено: ${actual_price}")
+        print(f"Ошибка! Ожидалось: ${expected_price}, Получено: ${actual_price}")
 
 except Exception as e:
     print(f"Произошла ошибка: {e}")
