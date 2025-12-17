@@ -1,6 +1,9 @@
 import allure
 import pytest
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from ..pages.CalculatorPage import CalculatorPage
 
 
@@ -30,14 +33,20 @@ def test_slow_calculator(driver):
     with allure.step("Выполнить вычисление 7 + 8"):
         calc.calculate_7_plus_8()
 
-    with allure.step("Дождаться результата 15 (ожидание до 50 секунд)"):
-        # Используем новый метод который ждет именно результат 15
-        result = calc.wait_for_result_15(timeout=50)
+    with allure.step("Дождаться результата (без sleep)"):
+        # Используем WebDriverWait для ожидания результата
+        wait = WebDriverWait(driver, 50)  # 50 секунд максимум
 
-        # Прикрепляем отладочную информацию
-        allure.attach(f"Полученный результат: '{result}'",
-                      name="Result info",
-                      attachment_type=allure.attachment_type.TEXT)
+        # Ждем пока результат не станет "15"
+        result = wait.until(
+            EC.text_to_be_present_in_element(
+                (By.CSS_SELECTOR, ".screen"),
+                "15"
+            )
+        )
+
+        # Получаем текст результата
+        result_text = driver.find_element(By.CSS_SELECTOR, ".screen").text
 
     with allure.step("Проверить результат"):
-        assert result == "15", f"Ожидалось '15', получено '{result}'"
+        assert result_text == "15", f"Ожидалось '15', получено '{result_text}'"

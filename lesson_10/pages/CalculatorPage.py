@@ -6,11 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class CalculatorPage:
     def __init__(self, driver):
-        """Инициализация страницы калькулятора.
-
-        Args:
-            driver: WebDriver экземпляр
-        """
+        """Инициализация страницы калькулятора."""
         self.driver = driver
         self.wait = WebDriverWait(driver, 50)
 
@@ -21,47 +17,25 @@ class CalculatorPage:
 
     @allure.step("Открыть страницу калькулятора")
     def open(self):
-        """Открывает страницу калькулятора.
-
-        Returns:
-            None
-        """
+        """Открывает страницу калькулятора."""
         self.driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
 
     @allure.step("Установить задержку {delay_value} секунд")
     def set_delay(self, delay_value):
-        """Устанавливает значение задержки.
-
-        Args:
-            delay_value (int): Значение задержки в секундах
-
-        Returns:
-            None
-        """
+        """Устанавливает значение задержки."""
         delay_field = self.driver.find_element(*self.delay_input)
         delay_field.clear()
         delay_field.send_keys(str(delay_value))
 
     @allure.step("Нажать кнопку '{button_text}'")
     def click_button(self, button_text):
-        """Нажимает кнопку калькулятора.
-
-        Args:
-            button_text (str): Текст на кнопке
-
-        Returns:
-            None
-        """
+        """Нажимает кнопку калькулятора."""
         xpath = f'//span[text()="{button_text}"]'
         self.driver.find_element(By.XPATH, xpath).click()
 
     @allure.step("Очистить калькулятор")
     def clear(self):
-        """Очищает экран калькулятора.
-
-        Returns:
-            None
-        """
+        """Очищает экран калькулятора."""
         try:
             self.driver.find_element(*self.clear_button).click()
         except:
@@ -69,11 +43,7 @@ class CalculatorPage:
 
     @allure.step("Выполнить вычисление 7 + 8")
     def calculate_7_plus_8(self):
-        """Выполняет операцию сложения 7 + 8.
-
-        Returns:
-            None
-        """
+        """Выполняет операцию сложения 7 + 8."""
         self.clear()
         self.click_button("7")
         self.click_button("+")
@@ -82,35 +52,18 @@ class CalculatorPage:
 
     @allure.step("Получить результат вычисления")
     def get_result(self):
-        """Получает результат вычисления.
-
-        Returns:
-            str: Результат вычисления
-        """
-        # Ждем пока результат появится (не пустая строка)
+        """Получает результат вычисления."""
+        # Ожидаем пока результат изменится (не будет "7+8")
         self.wait.until(
-            lambda driver: driver.find_element(*self.screen).text.strip() != ""
+            lambda driver: driver.find_element(*self.screen).text != "7+8"
         )
-        # Возвращаем текст результата
         return self.driver.find_element(*self.screen).text
 
     @allure.step("Дождаться результата 15")
-    def wait_for_result_15(self, timeout=50):
-        """Ожидает пока результат не станет равным '15'.
-
-        Args:
-            timeout (int): Максимальное время ожидания в секундах
-
-        Returns:
-            str: Результат вычисления
-        """
-        # Создаем новый wait с указанным timeout
+    def wait_for_result(self, expected_result="15", timeout=50):
+        """Ожидает конкретный результат."""
         wait = WebDriverWait(self.driver, timeout)
-
-        # Ждем пока результат не станет '15'
         wait.until(
-            lambda driver: driver.find_element(*self.screen).text.strip() == "15"
+            EC.text_to_be_present_in_element(self.screen, expected_result)
         )
-
-        # Возвращаем результат
         return self.driver.find_element(*self.screen).text
